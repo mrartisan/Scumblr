@@ -40,11 +40,13 @@ class RepoDownloader
     #contents are scanned
     has_ssh_key = true
     res = ""
-    pid, stdin, stdout, stderr = popen4(*(tokenize_command("ssh -v git@github.com 2>&1")))
+    pid, stdin, stdout, stderr = popen4("ssh -v git@github.com 2>&1")
     res += stdout.read
     if res =~ /Permission denied/
       has_ssh_key = false
     end
+    pid, status = Process::waitpid2(pid)
+    [stdin, stdout, stderr].each { |io| io.close if !io.closed? }
 
     github_token = Rails.configuration.try(:github_oauth_token).to_s.strip
     repo_url_parts = URI.parse(repo)
@@ -68,7 +70,7 @@ class RepoDownloader
       g.fetch
     rescue => e
       create_event("Unable to clone from Git #{repo}.\n\n. Exception: #{e.message}\n#{e.backtrace}", "Warn")
-      return
+      return false
     end
 
     if !Dir.exists?(save_path)

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.6'
+gem 'rails', '4.2.10'
 
 gem 'zip'
 gem 'lograge'
@@ -18,7 +18,6 @@ gem "brakeman", require: false
 gem "bundler-audit"
 gem 'rest-client'
 gem 'chartkick'
-
 gem 'redcarpet'
 
 gem 'addressable'
@@ -44,8 +43,8 @@ gem 'git'
 gem 'workflowable'
 
 #JIRA Integration
-gem 'jiralicious'
-
+#gem 'jiralicious'
+gem 'jira-ruby'
 #Authorization
 gem 'cancan'
 
@@ -53,9 +52,9 @@ gem 'cancan'
 gem 'ransack'
 
 #Image processing/attachments
-gem 'paperclip'
-gem 'aws-sdk', '< 2.0'
-
+gem 'paperclip', ">= 5.0"
+gem 'aws-sdk'
+gem 'aws-sdk-ses'
 
 # Time period parsing
 gem 'chronic'
@@ -72,6 +71,9 @@ gem 'activerecord-import'
 #Used for task queueing
 gem 'sidekiq'
 gem 'sidekiq-status'
+gem 'sidekiq-scheduler'
+gem 'sidekiq-limit_fetch'
+gem 'mlanett-redis-lock', require: 'redis-lock'
 
 #Pagination
 gem 'kaminari'
@@ -126,11 +128,14 @@ group :development, :test, :production do
   gem 'unicorn-rails'
 end
 
-group :test, :production do
+group :test do
   #this doesn't get along with rack-mini-profiler
   gem 'oj_mimic_json'
 end
 
+# Used for Redis Cache
+gem "redis-store", ">= 1.4.1"
+gem "redis-rails"
 
 group :development, :dirtylaundrydev do
   gem 'spring', group: :development
@@ -160,14 +165,14 @@ end
 
 #Testing
 group :development, :test, :dirtylaundrydev do
-  gem 'rspec-rails'
+  #gem 'rspec-rails'
   gem 'factory_girl_rails'
 
 end
 
 group :test do
   gem 'database_cleaner'
-  gem 'shoulda'
+  gem 'shoulda', '~> 3.5'
   gem 'activerecord-nulldb-adapter'
   gem 'minitest-reporters'
   gem 'shoulda-matchers', '~> 2.0'
@@ -176,10 +181,10 @@ group :test do
 end
 
 gem 'foundation-rails', '5.3.3.0'
-gem 'sass-rails',   '4.0.3'
+gem 'sass-rails',   '5.0.7'
 gem 'sass', '3.2.19'
 gem 'coffee-rails', '4.0.1'
-gem 'sprockets', '2.11.0'
+gem 'sprockets', '2.11.3'
 
 
 gem 'uglifier'
@@ -188,6 +193,7 @@ gem 'jquery-rails'
 
 gem 'rb-readline'
 
+gem 'crack', '0.3.2'
 
 # needed by  sidekiq
 gem 'json'

@@ -12,7 +12,6 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-
 class ScumblrTask::Sketchy < ScumblrTask::Base
   def self.task_type_name
     "Sketchy Task"
@@ -23,7 +22,7 @@ class ScumblrTask::Sketchy < ScumblrTask::Base
   end
 
   def self.options
-    return {
+    return super.merge({
       :saved_result_filter=> {name: "Result Filter",
                               description: "Only screenshot results matching the given filter",
                               required: false,
@@ -46,7 +45,7 @@ class ScumblrTask::Sketchy < ScumblrTask::Base
                              type: :boolean,
                              default: false
                              }
-    }
+    })
   end
 
   def self.description
@@ -73,15 +72,18 @@ class ScumblrTask::Sketchy < ScumblrTask::Base
 
     }
 
-    
+
   end
 
   def initialize(options={})
     # Do setup
+
+    @return_batched_results = false
     super
   end
 
   def run
+
     @options.each do |k,v|
       puts "Option #{k}: #{v}"
     end
@@ -93,11 +95,12 @@ class ScumblrTask::Sketchy < ScumblrTask::Base
       @results = @results.includes(:result_attachments).where('result_attachments.id is null').references(:result_attachments)
     end
 
+    @results = @results.find_each(batch_size:10)
+
     result_ids = []
-    @results.find_each do |r|
+    @results.each do |r|
       result_ids << r.id
     end
-
 
     # puts "Result ids: #{result_ids}"
     ScreenshotSyncTaskRunner.perform_async(result_ids, status_code_only)
